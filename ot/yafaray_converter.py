@@ -312,12 +312,14 @@ def convertWorld(world):
     switch_bg_Type = {"Single Color": "Single Color", "Gradient": "Gradient", "Texture": "Texture", \
                       "Sunsky": "Sunsky1", "DarkTide's SunSky": "Sunsky2"}
     world.bg_type = switch_bg_Type.get(props["bg_type"], "Single Color")
-    world.v_int_type = props["volType"]
-    world.v_int_step_size = props["stepSize"]
-    world.v_int_adaptive = props["adaptive"]
-    world.v_int_optimize = props["optimize"]
-    world.v_int_attgridres = props["attgridScale"]
-    world.bg_from = props["from"]
+
+    if "volType" in props:
+        world.v_int_type = props["volType"]
+        world.v_int_step_size = props["stepSize"]
+        world.v_int_adaptive = props["adaptive"]
+        world.v_int_optimize = props["optimize"]
+        world.v_int_attgridres = props["attgridScale"]
+        world.bg_from = props["from"]
 
     variableDict = dict(
         color="single_color",

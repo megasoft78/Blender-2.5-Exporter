@@ -182,6 +182,7 @@ def register():
         items=(
             ('Direct Lighting', "Direct Lighting", ""),
             ('Photon Mapping', "Photon Mapping", ""),
+			('Photon Mapping with Irradiance Cache', "Photon Mapping with Irradiance Cache", ""),
             ('Pathtracing', "Pathtracing", ""),
             ('Debug', "Debug", ""),
             ('Bidirectional', "Bidirectional", ""),
@@ -269,6 +270,23 @@ def register():
         name="Final Gather",
         description="Use final gathering (recommended)",
         default=True)
+
+    Scene.intg_do_IC = BoolProperty(
+        name="Use IrrCache",
+        description="Enable the use of irradiance cache",
+        default=True)
+
+    Scene.intg_IC_M_Divs = IntProperty(
+        name="Max Samples",
+        description="Maximum number of samples per IC record",
+        min=10, max=25,
+        default=10)
+
+    Scene.intg_IC_Kappa = IntProperty(
+        name="Accuracy",
+        description="The higher the value the smaller the IC record radius",
+        min=1, max=3,
+        default=1)
 
     Scene.intg_fg_bounces = IntProperty(
         name="Bounces",

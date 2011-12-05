@@ -80,6 +80,42 @@ class YAF_PT_render(RenderButtonsPanel, Panel):
                 col = layout.row()
                 col.prop(scene, "intg_show_map", toggle=True)
 
+        elif scene.intg_light_method == "Photon Mapping with Irradiance Cache":
+            row = layout.row()
+
+            row.prop(scene, "intg_bounces")
+
+            row = layout.row()
+
+            col = row.column(align=True)
+            col.label(" Diffuse Photons:", icon='MOD_PHYSICS')
+            col.prop(scene, "intg_photons")
+            col.prop(scene, "intg_diffuse_radius")
+            col.prop(scene, "intg_search")
+
+            col = row.column(align=True)
+            col.label(" Caustic Photons:", icon='MOD_PARTICLES')
+            col.prop(scene, "intg_cPhotons")
+            col.prop(scene, "intg_caustic_radius")
+            col.prop(scene, "intg_caustic_mix")
+
+            row = layout.row()
+            row.prop(scene, "intg_final_gather", toggle=True, icon='FORCE_FORCE')
+
+            if scene.intg_final_gather:
+                col = layout.row()
+                col.prop(scene, "intg_fg_bounces")
+                col.prop(scene, "intg_fg_samples")
+                col = layout.row()
+                col.prop(scene, "intg_show_map", toggle=True)
+                col = layout.row()
+                col.prop(scene, "intg_do_IC", toggle=True)
+
+                if scene.intg_do_IC:
+                    col = layout.row()
+                    col.prop(scene, "intg_IC_M_Divs")
+                    col.prop(scene, "intg_IC_Kappa")
+
         elif scene.intg_light_method == "Pathtracing":
             col = layout.row()
             col.prop(scene, "intg_caustic_method")

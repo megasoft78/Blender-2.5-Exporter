@@ -68,6 +68,22 @@ class yafIntegrator:
             yi.paramsSetBool("finalGather", scene.intg_final_gather)
             yi.paramsSetInt("bounces", scene.intg_bounces)
 
+        elif light_type == "Photon Mapping with Irradiance Cache":
+            yi.paramsSetString("type", "photonIC")
+            yi.paramsSetInt("fg_samples", scene.intg_fg_samples)
+            yi.paramsSetInt("photons", scene.intg_photons)
+            yi.paramsSetInt("cPhotons", scene.intg_cPhotons)
+            yi.paramsSetFloat("diffuseRadius", scene.intg_diffuse_radius)
+            yi.paramsSetFloat("causticRadius", scene.intg_caustic_radius)
+            yi.paramsSetInt("search", scene.intg_search)
+            yi.paramsSetBool("show_map", scene.intg_show_map)
+            yi.paramsSetInt("fg_bounces", scene.intg_fg_bounces)
+            yi.paramsSetInt("caustic_mix", scene.intg_caustic_mix)
+            yi.paramsSetBool("finalGather", scene.intg_final_gather)
+            yi.paramsSetInt("IC_M_Divs", scene.intg_IC_M_Divs)
+            yi.paramsSetFloat("IC_Kappa", scene.intg_IC_Kappa)
+            yi.paramsSetBool("do_IC", scene.intg_do_IC)
+
         elif light_type == "Pathtracing":
             yi.paramsSetString("type", "pathtracing")
             yi.paramsSetInt("path_samples", scene.intg_path_samples)
