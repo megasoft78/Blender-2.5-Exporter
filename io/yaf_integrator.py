@@ -55,8 +55,7 @@ class yafIntegrator:
                 yi.paramsSetColor("AO_color", c[0], c[1], c[2])
 
         
-        # test for integrate Irradiance Cache into PhotonMapping
-        elif light_type == "Photon Mapping" or light_type == "Photon Mapping IC":
+        elif light_type == "Photon Mapping":
             yi.paramsSetInt("bounces", scene.intg_bounces)
             yi.paramsSetInt("photons", scene.intg_photons)
             yi.paramsSetInt("cPhotons", scene.intg_cPhotons)
@@ -70,12 +69,25 @@ class yafIntegrator:
                 yi.paramsSetInt("fg_samples", scene.intg_fg_samples)
                 yi.paramsSetInt("fg_bounces", scene.intg_fg_bounces)
             yi.paramsSetString("type", "photonmapping")
-            #--
+            
+        elif light_type == "Photon Mapping IC":
+            yi.paramsSetInt("bounces", scene.intg_bounces)
+            yi.paramsSetInt("photons", scene.intg_photons)
+            yi.paramsSetInt("cPhotons", scene.intg_cPhotons)
+            yi.paramsSetFloat("diffuseRadius", scene.intg_diffuse_radius)
+            yi.paramsSetFloat("causticRadius", scene.intg_caustic_radius)
+            yi.paramsSetInt("search", scene.intg_search)
+            yi.paramsSetInt("caustic_mix", scene.intg_caustic_mix)
+            #
+            yi.paramsSetBool("finalGather", True)
+            yi.paramsSetBool("show_map", scene.intg_show_map)
+            yi.paramsSetInt("fg_samples", 1)# IC only use 1 fg sample, atm...
+            yi.paramsSetInt("fg_bounces", 3)# only for test
             if scene.intg_do_IC:
                 yi.paramsSetBool("do_IC", scene.intg_do_IC)
                 yi.paramsSetInt("IC_M_Divs", scene.intg_IC_M_Divs)
                 yi.paramsSetFloat("IC_Kappa", scene.intg_IC_Kappa)
-                yi.paramsSetString("type", "photonIC")
+            yi.paramsSetString("type", "photonIC")
 
         elif light_type == "Pathtracing":
             yi.paramsSetString("type", "pathtracing")
