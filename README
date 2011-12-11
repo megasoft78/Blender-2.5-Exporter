@@ -1,7 +1,7 @@
 Yafaray Exporter for Blender 2.60:
 
 Special notes: 
-This repository  is a base , for  experimental  'Photon Mapping Irradiance Cache' support.
+This repository  is a base, for experimental 'Photon Mapping Irradiance Cache' exporter support.
 Project from GSOC 2010, started by 'Glaskows'.
 
 More infor:
