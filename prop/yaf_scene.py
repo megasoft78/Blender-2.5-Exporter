@@ -272,7 +272,7 @@ def register():
         default=True)
 
     Scene.intg_do_IC = BoolProperty(
-        name="Use IrrCache",
+        name="Use Irradiance Cache",
         description="Enable the use of irradiance cache",
         default=True)
 
@@ -302,7 +302,7 @@ def register():
 
     Scene.intg_show_map = BoolProperty(
         name="Show radiance map",
-        description="Directly show radiance map, useful to calibrate the photon map (disables final gathering step)",
+        description="Directly show radiance map, useful to calibrate the photon map (disables FG / IC step)",
         default=False)
 
     Scene.intg_caustic_method = EnumProperty(
