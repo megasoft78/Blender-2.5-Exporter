@@ -100,22 +100,14 @@ class YAF_PT_render(RenderButtonsPanel, Panel):
             col.prop(scene, "intg_caustic_mix")
 
             row = layout.row()
-            row.prop(scene, "intg_final_gather", toggle=True, icon='FORCE_FORCE')
+            row.prop(scene, "intg_do_IC", toggle=True)
 
-            if scene.intg_final_gather:
-                col = layout.row()
-                col.prop(scene, "intg_fg_bounces")
-                col.prop(scene, "intg_fg_samples")
-                col = layout.row()
-                col.prop(scene, "intg_show_map", toggle=True)
-                col = layout.row()
-            row = layout.row()
-            col.prop(scene, "intg_do_IC", toggle=True)
-            
             if scene.intg_do_IC:
                 col = layout.row()
                 col.prop(scene, "intg_IC_M_Divs")
                 col.prop(scene, "intg_IC_Kappa")
+                row = layout.row()
+                row.prop(scene, "intg_show_map", toggle=True)
 
         elif scene.intg_light_method == "Pathtracing":
             col = layout.row()
