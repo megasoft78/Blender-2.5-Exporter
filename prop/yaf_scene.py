@@ -182,7 +182,7 @@ def register():
         items=(
             ('Direct Lighting', "Direct Lighting", ""),
             ('Photon Mapping', "Photon Mapping", ""),
-			('Photon Mapping with Irradiance Cache', "Photon Mapping with Irradiance Cache", ""),
+	    ('Photon Mapping IC', "Photon Mapping IC", ""),
             ('Pathtracing', "Pathtracing", ""),
             ('Debug', "Debug", ""),
             ('Bidirectional', "Bidirectional", ""),
@@ -272,7 +272,7 @@ def register():
         default=True)
 
     Scene.intg_do_IC = BoolProperty(
-        name="Use IrrCache",
+        name="Use Irradiance Cache",
         description="Enable the use of irradiance cache",
         default=True)
 
@@ -282,7 +282,7 @@ def register():
         min=1, max=50,
         default=10)
 
-    Scene.intg_IC_Kappa = IntProperty(
+    Scene.intg_IC_Kappa = FloatProperty(
         name="Accuracy",
         description="The higher the value the smaller the IC record radius",
         min=0.1, max=3,
@@ -302,7 +302,7 @@ def register():
 
     Scene.intg_show_map = BoolProperty(
         name="Show radiance map",
-        description="Directly show radiance map, useful to calibrate the photon map (disables final gathering step)",
+        description="Directly show radiance map, useful to calibrate the photon map (disables FG / IC step)",
         default=False)
 
     Scene.intg_caustic_method = EnumProperty(
