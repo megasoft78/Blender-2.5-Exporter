@@ -279,13 +279,13 @@ def register():
     Scene.intg_IC_M_Divs = IntProperty(
         name="Max Samples",
         description="Maximum number of samples per IC record",
-        min=10, max=25,
+        min=1, max=50,
         default=10)
 
     Scene.intg_IC_Kappa = IntProperty(
         name="Accuracy",
         description="The higher the value the smaller the IC record radius",
-        min=1, max=3,
+        min=0.1, max=3,
         default=1)
 
     Scene.intg_fg_bounces = IntProperty(

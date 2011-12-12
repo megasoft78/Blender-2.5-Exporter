@@ -28,9 +28,9 @@ Texture = bpy.types.Texture
 # try to update blender propertie texture.type to YafaRay's texture.yaf_tex_type
 def call_tex_type_update(self, context):
     try:
-    tex = context.texture
-    if tex is not None:
-        tex.type = tex.yaf_tex_type
+        tex = context.texture
+        if tex is not None:
+            tex.type = tex.yaf_tex_type
     except:
         pass
 

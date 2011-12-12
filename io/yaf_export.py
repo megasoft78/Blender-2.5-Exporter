@@ -243,8 +243,8 @@ class YafaRayRenderEngine(bpy.types.RenderEngine):
             self.y = self.sizeY        
 
         if scene.gs_type_render == "file":
-        self.setInterface(yafrayinterface.yafrayInterface_t())
-        self.yi.setInputGamma(scene.gs_gamma_input, True)
+            self.setInterface(yafrayinterface.yafrayInterface_t())
+            self.yi.setInputGamma(scene.gs_gamma_input, True)
             self.outputFile, self.output, self.file_type = self.decideOutputFileName(fp, scene.img_output)
             self.yi.paramsClearAll()
             self.yi.paramsSetString("type", self.file_type)
