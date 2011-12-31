@@ -74,6 +74,8 @@ class yafLight:
 
         if matrix is None:
             matrix = lamp_object.matrix_world.copy()
+        #if int(bpy.app.build_revision[4:]) > 42815:
+        matrix = matrix.transposed()
         pos = matrix[3]
         dir = matrix[2]
         # up = matrix[1]  /* UNUSED */

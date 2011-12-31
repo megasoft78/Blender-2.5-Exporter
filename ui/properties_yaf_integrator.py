@@ -109,6 +109,53 @@ class YAF_PT_render(RenderButtonsPanel, Panel):
                 row = layout.row()
                 row.prop(scene, "intg_show_map", toggle=True)
 
+        elif scene.intg_light_method == "Photon Mapping GPU":
+            row = layout.row()
+
+            row.prop(scene, "intg_bounces")
+
+            row = layout.row()
+
+            col = row.column(align=True)
+            col.label(" Diffuse Photons:", icon='MOD_PHYSICS')
+            col.prop(scene, "intg_photons")
+            col.prop(scene, "intg_diffuse_radius")
+            col.prop(scene, "intg_search")
+
+            col = row.column(align=True)
+            col.label(" Caustic Photons:", icon='MOD_PARTICLES')
+            col.prop(scene, "intg_cPhotons")
+            col.prop(scene, "intg_caustic_radius")
+            col.prop(scene, "intg_caustic_mix")
+
+            row = layout.row()
+            row.prop(scene, "intg_show_map", toggle=True)
+
+            row = layout.row()
+            row.label("OpenCL Settings:")
+
+            row = layout.row()
+            row.prop(scene, "intg_ph_method")
+            
+            row = layout.row()
+            row.prop(scene, "intg_ph_leaf_radius")
+            row.prop(scene, "intg_ph_candidate_multi")
+            
+            row = layout.row()
+            row.prop(scene, "intg_ph_area_multiplier")
+            
+            row = layout.row()
+            row.prop(scene, "intg_fg_OCL", toggle=True)
+
+            row = layout.row()
+            row.prop(scene, "intg_ph_show_cover")
+            row.prop(scene, "intg_ph_test_rays")
+            row.prop(scene, "intg_ph_benchmark_ray_count")
+            
+            row = layout.row()
+            row.prop(scene, "intg_ph_benchmark_min_tile_size")
+            row.prop(scene, "intg_ph_work_group_size")
+            
         elif scene.intg_light_method == "Pathtracing":
             col = layout.row()
             col.prop(scene, "intg_caustic_method")

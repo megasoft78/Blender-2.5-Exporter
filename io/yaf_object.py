@@ -58,8 +58,8 @@ class yafObject(object):
             # at 0,0,0 looking towards 0,0,1 (y axis being up)
 
             m = bpy.types.YAFA_RENDER.viewMatrix
-
-            m.transpose()
+            #if not int(bpy.app.build_revision[4:]) > 42815:
+            #    m.transpose()
             inv = m.inverted()
 
             pos = multiplyMatrix4x4Vector4(inv, mathutils.Vector((0, 0, 0, 1)))
@@ -71,6 +71,8 @@ class yafObject(object):
 
         else:
             matrix = camera.matrix_world.copy()  # get cam worldspace transformation matrix, e.g. if cam is parented local does not work
+            #if int(bpy.app.build_revision[4:]) > 42815:
+            matrix = matrix.transposed()
             pos = matrix[3]
             dir = matrix[2]
             up = pos + matrix[1]
@@ -279,7 +281,8 @@ class yafObject(object):
         self.yi.printInfo("Exporting Instance of {0} [ID = {1:d}]".format(name, oID))
 
         mat4 = obj2WorldMatrix.to_4x4()
-        mat4.transpose()
+        #if not int(bpy.app.build_revision[4:]) > 42815:
+        #    mat4.transpose()
 
         o2w = self.get4x4Matrix(mat4)
 

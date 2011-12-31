@@ -182,9 +182,23 @@ class YAFARAY_OT_presets_renderset(YAF_AddPresetBase, Operator):
         "scene.intg_search",
         "scene.intg_final_gather",
         "scene.intg_fg_bounces",
+        
+        # Photonmap IC settings
         "scene.intg_IC_M_Divs",
         "scene.intg_IC_Kappa",
         "scene.intg_do_IC",
+        
+        # Photonmap GPU settings
+        "scene.intg_ph_leaf_radius",
+        "scene.intg_ph_candidate_multi",
+        "scene.intg_ph_area_multiplier",
+        "scene.intg_ph_show_cover",
+        "scene.intg_ph_test_rays",
+        "scene.intg_ph_benchmark_ray_count",
+        "scene.intg_ph_benchmark_min_tile_size",
+        "scene.intg_ph_work_group_size",
+        "scene.intg_fg_OCL",
+        
         "scene.intg_fg_samples",
         "scene.intg_show_map",
         "scene.intg_caustic_method",
