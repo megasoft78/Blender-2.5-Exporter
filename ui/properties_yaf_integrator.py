@@ -51,6 +51,31 @@ class YAF_PT_render(RenderButtonsPanel, Panel):
                 col.prop(scene, "intg_AO_samples")
                 col.prop(scene, "intg_AO_distance")
 
+        elif scene.intg_light_method == "Direct Lighting IC":
+            row = layout.row()
+            col = row.column(align=True)
+            col.prop(scene, "intg_use_caustics", toggle=True)
+            if scene.intg_use_caustics:
+                col.prop(scene, "intg_caustic_depth")
+                col.prop(scene, "intg_photons")
+                col.prop(scene, "intg_caustic_radius")
+                col.prop(scene, "intg_caustic_mix")
+
+            col = row.column(align=True)
+            col.prop(scene, "intg_use_AO", toggle=True)
+            if scene.intg_use_AO:
+                col.prop(scene, "intg_AO_color")
+                col.prop(scene, "intg_AO_samples")
+                col.prop(scene, "intg_AO_distance")
+
+            row = layout.row()
+            row.prop(scene, "intg_do_IC", toggle=True)
+
+            if scene.intg_do_IC:
+                col = layout.row()
+                col.prop(scene, "intg_IC_M_Divs")
+                col.prop(scene, "intg_IC_Kappa")
+                
         elif scene.intg_light_method == "Photon Mapping":
             row = layout.row()
 

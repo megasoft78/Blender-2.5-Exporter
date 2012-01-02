@@ -181,6 +181,7 @@ def register():
         name="Lighting Method",
         items=(
             ('Direct Lighting', "Direct Lighting", ""),
+            ('Direct Lighting IC', "Direct Lighting IC", ""),
             ('Photon Mapping', "Photon Mapping", ""),
 	    ('Photon Mapping IC', "Photon Mapping IC", ""),
             ('Photon Mapping GPU', "Photon Mapping GPU", ""),
