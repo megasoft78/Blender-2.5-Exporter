@@ -53,7 +53,7 @@ if sys.platform == 'win32':
 elif sys.platform == 'darwin':
     dllArray = ['libyafaraycore.dylib', 'libyafarayplugin.dylib']
 else:
-    dllArray = ['libyafaraycore.so', 'libyafarayplugin.so']
+    dllArray = ['libopencl_wrapper.so', 'libyafaraycore.so', 'libyafarayplugin.so']
 
 for dll in dllArray:
     try:
