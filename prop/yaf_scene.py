@@ -34,7 +34,7 @@ Scene = bpy.types.Scene
 def call_update_fileformat(self, context):
     scene = context.scene
     render = scene.render
-    if scene.img_output != render.image_settings.file_format:
+    if scene.img_output is not render.image_settings.file_format:
         render.image_settings.file_format = scene.img_output
         if render.image_settings.file_format == "OPEN_EXR" and scene.gs_z_channel:
             render.image_settings.use_zbuffer = True
@@ -183,7 +183,7 @@ def register():
             ('Direct Lighting', "Direct Lighting", ""),
             ('Direct Lighting IC', "Direct Lighting IC", ""),
             ('Photon Mapping', "Photon Mapping", ""),
-	    ('Photon Mapping IC', "Photon Mapping IC", ""),
+	        ('Photon Mapping IC', "Photon Mapping IC", ""),
             ('Photon Mapping GPU', "Photon Mapping GPU", ""),
             ('Pathtracing', "Pathtracing", ""),
             ('Debug', "Debug", ""),
@@ -369,7 +369,7 @@ def register():
 
     Scene.intg_show_map = BoolProperty(
         name="Show radiance map",
-        description="Directly show radiance map, useful to calibrate the photon map (disables FG / IC step)",
+        description="Directly show radiance map, useful to calibrate the photon map (disables final gathering step)",
         default=False)
 
     Scene.intg_caustic_method = EnumProperty(

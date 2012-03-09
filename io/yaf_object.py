@@ -58,8 +58,7 @@ class yafObject(object):
             # at 0,0,0 looking towards 0,0,1 (y axis being up)
 
             m = bpy.types.YAFA_RENDER.viewMatrix
-            #if not int(bpy.app.build_revision[4:]) > 42815:
-            #    m.transpose()
+            # m.transpose() --> not needed anymore: matrix indexing changed with Blender rev.42816
             inv = m.inverted()
 
             pos = multiplyMatrix4x4Vector4(inv, mathutils.Vector((0, 0, 0, 1)))
@@ -70,12 +69,13 @@ class yafObject(object):
             up = aboveCam
 
         else:
-            matrix = camera.matrix_world.copy()  # get cam worldspace transformation matrix, e.g. if cam is parented local does not work
-            #if int(bpy.app.build_revision[4:]) > 42815:
-            matrix = matrix.transposed()
-            pos = matrix[3]
-            dir = matrix[2]
-            up = pos + matrix[1]
+            # get cam worldspace transformation matrix, e.g. if cam is parented matrix_local does not work
+            matrix = camera.matrix_world.copy()
+            # matrix indexing (row, colums) changed in Blender rev.42816, for explanation see also:
+            # http://wiki.blender.org/index.php/User:TrumanBlending/Matrix_Indexing
+            pos = matrix.col[3]
+            dir = matrix.col[2]
+            up = pos + matrix.col[1]
 
         to = pos - dir
 
@@ -177,72 +177,6 @@ class yafObject(object):
 
         return ret
 
-    def writeObjects(self):
-
-        baseIds = {}
-        dupBaseIds = {}
-        # export only visible objects
-        for obj in [o for o in self.scene.objects if not o.hide_render and o.is_visible(self.scene) \
-        and (o.type in {'MESH', 'SURFACE', 'CURVE', 'FONT', 'EMPTY'})]:
-            # Exporting dupliObjects as instances: disabled exporting instances when global
-            # option "transp. shadows" is on -> crashes yafaray render engine
-            if obj.is_duplicator:
-                self.yi.printInfo("Processing duplis for: {0}".format(obj.name))
-                obj.dupli_list_create(self.scene)
-
-                for obj_dupli in obj.dupli_list:
-                    if self.scene.gs_transp_shad:
-                        matrix = obj_dupli.matrix.copy()
-                        self.writeMesh(obj_dupli.object, matrix)
-                    else:
-                        if obj_dupli.object.name not in dupBaseIds:
-                            dupBaseIds[obj_dupli.object.name] = self.writeInstanceBase(obj_dupli.object)
-                        matrix = obj_dupli.matrix.copy()
-                        self.writeInstance(dupBaseIds[obj_dupli.object.name], matrix, obj_dupli.object.name)
-
-                if obj.dupli_list is not None:
-                    obj.dupli_list_clear()
-
-                # check if object has particle system and uses the option for 'render emitter'
-                if hasattr(obj, 'particle_systems'):
-                    for pSys in obj.particle_systems:
-                        check_rendertype = pSys.settings.render_type in {'OBJECT', 'GROUP'}
-                        if check_rendertype and pSys.settings.use_render_emitter:
-                            matrix = obj.matrix_world.copy()
-                            self.writeMesh(obj, matrix)
-
-            # no need to write empty object from here on, so continue with next object in loop
-            elif obj.type == 'EMPTY':
-                continue
-
-            # Exporting objects with shared mesh data blocks as instances: disabled exporting instances when global
-            # option "transparent shadows" is on -> crashes yafaray render engine
-            elif obj.data.users > 1 and not self.scene.gs_transp_shad:
-                has_orco = False
-                # check materials and textures of object for 'ORCO' texture coordinates
-                # if so: do not export them as instances -> gives weird rendering results!
-                for mat_slot in [m for m in obj.material_slots if m.material is not None]:
-                    for tex in [t for t in mat_slot.material.texture_slots if (t and t.texture and t.use)]:
-                        if tex.texture_coords == 'ORCO':
-                            has_orco = True
-                            break  # break tex loop
-                    if has_orco:
-                        break  # break mat_slot loop
-                if has_orco:
-                    self.writeObject(obj)
-                else:
-                    self.yi.printInfo("Processing shared mesh data node object: {0}".format(obj.name))
-                    if obj.data.name not in baseIds:
-                        baseIds[obj.data.name] = self.writeInstanceBase(obj)
-
-                    if obj.name not in dupBaseIds:
-                        matrix = obj.matrix_world.copy()
-                        self.writeInstance(baseIds[obj.data.name], matrix, obj.data.name)
-
-            else:
-                if obj.data.name not in baseIds and obj.name not in dupBaseIds:
-                    self.writeObject(obj)
-
     def writeObject(self, obj, matrix=None):
 
         if not matrix:
@@ -257,8 +191,8 @@ class yafObject(object):
         elif obj.bgp_enable:  # BGPortal Light
             self.writeBGPortal(obj, matrix)
 
-        elif obj.particle_systems:  # Particle system
-            self.writeParticlesObject(obj, matrix)
+        elif obj.particle_systems:  # Particle Hair system
+            self.writeParticleStrands(obj, matrix)
 
         else:  # The rest of the object types
             self.writeMesh(obj, matrix)
@@ -281,8 +215,7 @@ class yafObject(object):
         self.yi.printInfo("Exporting Instance of {0} [ID = {1:d}]".format(name, oID))
 
         mat4 = obj2WorldMatrix.to_4x4()
-        #if not int(bpy.app.build_revision[4:]) > 42815:
-        #    mat4.transpose()
+        # mat4.transpose() --> not needed anymore: matrix indexing changed with Blender rev.42816
 
         o2w = self.get4x4Matrix(mat4)
 
@@ -361,13 +294,6 @@ class yafObject(object):
         # me = obj.data  /* UNUSED */
         # me_materials = me.materials  /* UNUSED */
 
-        mesh = obj.to_mesh(self.scene, True, 'RENDER')
-
-        if matrix is not None:
-            mesh.transform(matrix)
-        else:
-            return
-
         yi.paramsClearAll()
 
         if obj.vol_region == 'ExpDensity Volume':
@@ -399,37 +325,24 @@ class yafObject(object):
         yi.paramsSetFloat("sigma_s", obj.vol_scatter)
         yi.paramsSetInt("attgridScale", self.scene.world.v_int_attgridres)
 
-        min = [1e10, 1e10, 1e10]
-        max = [-1e10, -1e10, -1e10]
-        vertLoc = []
-        for v in mesh.vertices:
-            vertLoc.append(v.co[0])
-            vertLoc.append(v.co[1])
-            vertLoc.append(v.co[2])
+        # Calculate BoundingBox: get the low corner (minx, miny, minz)
+        # and the up corner (maxx, maxy, maxz) then apply object scale,
+        # also clamp the values to min: -1e10 and max: 1e10
 
-            if vertLoc[0] < min[0]:
-                min[0] = vertLoc[0]
-            if vertLoc[1] < min[1]:
-                min[1] = vertLoc[1]
-            if vertLoc[2] < min[2]:
-                min[2] = vertLoc[2]
-            if vertLoc[0] > max[0]:
-                max[0] = vertLoc[0]
-            if vertLoc[1] > max[1]:
-                max[1] = vertLoc[1]
-            if vertLoc[2] > max[2]:
-                max[2] = vertLoc[2]
+        mesh = obj.to_mesh(self.scene, True, 'RENDER')
+        mesh.transform(matrix)
 
-            vertLoc = []
+        vec = [j for v in mesh.vertices for j in v.co]
 
-        yi.paramsSetFloat("minX", min[0])
-        yi.paramsSetFloat("minY", min[1])
-        yi.paramsSetFloat("minZ", min[2])
-        yi.paramsSetFloat("maxX", max[0])
-        yi.paramsSetFloat("maxY", max[1])
-        yi.paramsSetFloat("maxZ", max[2])
+        yi.paramsSetFloat("minX", max(min(vec[0::3]), -1e10))
+        yi.paramsSetFloat("minY", max(min(vec[1::3]), -1e10))
+        yi.paramsSetFloat("minZ", max(min(vec[2::3]), -1e10))
+        yi.paramsSetFloat("maxX", min(max(vec[0::3]), 1e10))
+        yi.paramsSetFloat("maxY", min(max(vec[1::3]), 1e10))
+        yi.paramsSetFloat("maxZ", min(max(vec[2::3]), 1e10))
 
-        yi.createVolumeRegion("VR_" + obj.name + "." + str(obj.__hash__()))
+        yi.createVolumeRegion("VR.{0}-{1}".format(obj.name, str(obj.__hash__())))
+        bpy.data.meshes.remove(mesh)
 
     def writeGeometry(self, ID, obj, matrix, obType=0, oMat=None):
 
@@ -540,7 +453,7 @@ class yafObject(object):
 
         return ymaterial
 
-    def writeParticlesObject(self, object, matrix):
+    def writeParticleStrands(self, object, matrix):
 
         yi = self.yi
         renderEmitter = False
@@ -551,7 +464,7 @@ class yafObject(object):
         for pSys in object.particle_systems:
             for mod in [m for m in object.modifiers if (m is not None) and (m.type == 'PARTICLE_SYSTEM')]:
                 if (pSys.settings.render_type == 'PATH') and mod.show_render and (pSys.name == mod.particle_system.name):
-                    yi.printInfo("Exporter: Creating Particle System {!r}".format(pSys.name))
+                    yi.printInfo("Exporter: Creating Hair Particle System {!r}".format(pSys.name))
                     tstart = time.time()
                     # TODO: clay particles uses at least materials thikness?
                     if object.active_material is not None:

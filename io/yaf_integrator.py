@@ -76,19 +76,18 @@ class yafIntegrator:
             yi.paramsSetString("type", "directIC")
         
         elif light_type == "Photon Mapping":
-            yi.paramsSetInt("bounces", scene.intg_bounces)
+            yi.paramsSetString("type", "photonmapping")
+            yi.paramsSetInt("fg_samples", scene.intg_fg_samples)
             yi.paramsSetInt("photons", scene.intg_photons)
             yi.paramsSetInt("cPhotons", scene.intg_cPhotons)
             yi.paramsSetFloat("diffuseRadius", scene.intg_diffuse_radius)
             yi.paramsSetFloat("causticRadius", scene.intg_caustic_radius)
             yi.paramsSetInt("search", scene.intg_search)
+            yi.paramsSetBool("show_map", scene.intg_show_map)
+            yi.paramsSetInt("fg_bounces", scene.intg_fg_bounces)
             yi.paramsSetInt("caustic_mix", scene.intg_caustic_mix)
-            if scene.intg_final_gather:
-                yi.paramsSetBool("finalGather", scene.intg_final_gather)
-                yi.paramsSetBool("show_map", scene.intg_show_map)
-                yi.paramsSetInt("fg_samples", scene.intg_fg_samples)
-                yi.paramsSetInt("fg_bounces", scene.intg_fg_bounces)
-            yi.paramsSetString("type", "photonmapping")
+            yi.paramsSetBool("finalGather", scene.intg_final_gather)
+            yi.paramsSetInt("bounces", scene.intg_bounces)
             
         elif light_type == "Photon Mapping IC":
             yi.paramsSetInt("bounces", scene.intg_bounces)
@@ -156,15 +155,16 @@ class yafIntegrator:
             #-- test for simplify code
             causticTypeStr = scene.intg_caustic_method
             switchCausticType = {
-                'None' : 'none',
-                'Path' : 'path',
+                'None': 'none',
+                'Path': 'path',
                 'Photon': 'photon',
                 'Path+Photon': 'both',
             }
+
             causticType = switchCausticType.get(causticTypeStr)
             yi.paramsSetString("caustic_type", causticType)
-            
-            if causticType != 'none' and causticType != 'path':
+
+            if causticType not in {'none', 'path'}:
                 yi.paramsSetInt("photons", scene.intg_photons)
                 yi.paramsSetInt("caustic_mix", scene.intg_caustic_mix)
                 yi.paramsSetInt("caustic_depth", scene.intg_caustic_depth)

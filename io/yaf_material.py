@@ -105,9 +105,9 @@ class yafMaterial:
         tex = mtex.texture  # texture object instance
         # lots to do...
 
-        isImage = (tex.yaf_tex_type == 'IMAGE')
+        isImage = tex.yaf_tex_type == 'IMAGE'
 
-        if (isImage or (tex.yaf_tex_type == 'VORONOI' and tex.color_mode != 'INTENSITY')):
+        if (isImage or (tex.yaf_tex_type == 'VORONOI' and tex.color_mode not in 'INTENSITY')):
             isColored = True
         else:
             isColored = False
@@ -168,15 +168,14 @@ class yafMaterial:
         yi.paramsSetString("texco", texco)
 
         if mtex.object:
-            texmat = mtex.object.matrix_local.inverted()
+            texmat = mtex.object.matrix_world.inverted()
             rtmatrix = yafrayinterface.new_floatArray(4 * 4)
 
             for x in range(4):
                 for y in range(4):
                     idx = (y + x * 4)
                     yafrayinterface.floatArray_setitem(rtmatrix, idx, texmat[x][y])
-
-            yi.paramsSetMemMatrix("transform", rtmatrix, True)
+            yi.paramsSetMemMatrix("transform", rtmatrix, False)
             yafrayinterface.delete_floatArray(rtmatrix)
 
         yi.paramsSetInt("proj_x", proj2int(mtex.mapping_x))
@@ -353,7 +352,7 @@ class yafMaterial:
         bEmit = mat.emit
 
         if self.preview:
-            if mat.name.find("check") != -1:
+            if mat.name.startswith("checker"):
                 bEmit = 0.35
 
         i = 0
