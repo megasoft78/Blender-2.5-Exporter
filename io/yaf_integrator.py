@@ -151,6 +151,7 @@ class yafIntegrator:
             yi.paramsSetInt("path_samples", scene.intg_path_samples)
             yi.paramsSetInt("bounces", scene.intg_bounces)
             yi.paramsSetBool("no_recursive", scene.intg_no_recursion)
+			yi.paramsSetBool("useSSS", scene.intg_useSSS)
 
             #-- test for simplify code
             causticTypeStr = scene.intg_caustic_method
@@ -170,6 +171,12 @@ class yafIntegrator:
                 yi.paramsSetInt("caustic_depth", scene.intg_caustic_depth)
                 yi.paramsSetFloat("caustic_radius", scene.intg_caustic_radius)
 
+            if scene.intg_useSSS:
+                yi.paramsSetInt("sssPhotons", scene.intg_sssPhotons)
+				yi.paramsSetInt("sssDepth", scene.intg_sssDepth)
+				yi.paramsSetInt("singleScatterSamples", scene.intg_singleScatterSamples)
+                yi.paramsSetFloat("sssScale", scene.intg_sssScale)
+				
         elif light_type == "Bidirectional":
             yi.paramsSetString("type", "bidirectional")
 

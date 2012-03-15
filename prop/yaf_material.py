@@ -37,7 +37,8 @@ def register():
             ('coated_glossy', "Coated Glossy", "Assign a material type"),
             ('glass', "Glass", "Assign a material type"),
             ('rough_glass', "Rough Glass", "Assign a material type"),
-            ('blend', "Blend", "Assign a material type")
+            ('blend', "Blend", "Assign a material type"),
+			('translucent', "Translucent (SSS)", "Assign a material type")
         ),
         default='shinydiffusemat')
 
