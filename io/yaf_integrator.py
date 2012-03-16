@@ -54,6 +54,12 @@ class yafIntegrator:
                 c = scene.intg_AO_color
                 yi.paramsSetColor("AO_color", c[0], c[1], c[2])
 
+            if scene.intg_useSSS:
+                yi.paramsSetInt("sssPhotons", scene.intg_sssPhotons)
+                yi.paramsSetInt("sssDepth", scene.intg_sssDepth)
+                yi.paramsSetInt("singleScatterSamples", scene.intg_singleScatterSamples)
+                yi.paramsSetFloat("sssScale", scene.intg_sssScale)
+                
         elif light_type == "Direct Lighting IC":
             yi.paramsSetInt("bounces", scene.intg_bounces)
             yi.paramsSetInt("photons", scene.intg_photons)
@@ -73,6 +79,12 @@ class yafIntegrator:
                 yi.paramsSetInt("IC_M_Divs", scene.intg_IC_M_Divs)
                 yi.paramsSetFloat("IC_Kappa", scene.intg_IC_Kappa)
                 
+            if scene.intg_useSSS:
+                yi.paramsSetInt("sssPhotons", scene.intg_sssPhotons)
+                yi.paramsSetInt("sssDepth", scene.intg_sssDepth)
+                yi.paramsSetInt("singleScatterSamples", scene.intg_singleScatterSamples)
+                yi.paramsSetFloat("sssScale", scene.intg_sssScale)
+                
             yi.paramsSetString("type", "directIC")
         
         elif light_type == "Photon Mapping":
@@ -88,6 +100,12 @@ class yafIntegrator:
             yi.paramsSetInt("caustic_mix", scene.intg_caustic_mix)
             yi.paramsSetBool("finalGather", scene.intg_final_gather)
             yi.paramsSetInt("bounces", scene.intg_bounces)
+            
+            if scene.intg_useSSS:
+                yi.paramsSetInt("sssPhotons", scene.intg_sssPhotons)
+                yi.paramsSetInt("sssDepth", scene.intg_sssDepth)
+                yi.paramsSetInt("singleScatterSamples", scene.intg_singleScatterSamples)
+                yi.paramsSetFloat("sssScale", scene.intg_sssScale)
             
         elif light_type == "Photon Mapping IC":
             yi.paramsSetInt("bounces", scene.intg_bounces)
@@ -107,6 +125,12 @@ class yafIntegrator:
                 yi.paramsSetBool("do_IC", scene.intg_do_IC)
                 yi.paramsSetInt("IC_M_Divs", scene.intg_IC_M_Divs)
                 yi.paramsSetFloat("IC_Kappa", scene.intg_IC_Kappa)
+                
+            if scene.intg_useSSS:
+                yi.paramsSetInt("sssPhotons", scene.intg_sssPhotons)
+                yi.paramsSetInt("sssDepth", scene.intg_sssDepth)
+                yi.paramsSetInt("singleScatterSamples", scene.intg_singleScatterSamples)
+                yi.paramsSetFloat("sssScale", scene.intg_sssScale)
                 
             yi.paramsSetString("type", "photonIC")
 
@@ -146,12 +170,18 @@ class yafIntegrator:
             
             yi.paramsSetString("type", "photonmappingGPU")
 
+            if scene.intg_useSSS:
+                yi.paramsSetInt("sssPhotons", scene.intg_sssPhotons)
+                yi.paramsSetInt("sssDepth", scene.intg_sssDepth)
+                yi.paramsSetInt("singleScatterSamples", scene.intg_singleScatterSamples)
+                yi.paramsSetFloat("sssScale", scene.intg_sssScale)
+            
         elif light_type == "Pathtracing":
             yi.paramsSetString("type", "pathtracing")
             yi.paramsSetInt("path_samples", scene.intg_path_samples)
             yi.paramsSetInt("bounces", scene.intg_bounces)
             yi.paramsSetBool("no_recursive", scene.intg_no_recursion)
-			yi.paramsSetBool("useSSS", scene.intg_useSSS)
+            yi.paramsSetBool("useSSS", scene.intg_useSSS)
 
             #-- test for simplify code
             causticTypeStr = scene.intg_caustic_method
@@ -173,10 +203,10 @@ class yafIntegrator:
 
             if scene.intg_useSSS:
                 yi.paramsSetInt("sssPhotons", scene.intg_sssPhotons)
-				yi.paramsSetInt("sssDepth", scene.intg_sssDepth)
-				yi.paramsSetInt("singleScatterSamples", scene.intg_singleScatterSamples)
+                yi.paramsSetInt("sssDepth", scene.intg_sssDepth)
+                yi.paramsSetInt("singleScatterSamples", scene.intg_singleScatterSamples)
                 yi.paramsSetFloat("sssScale", scene.intg_sssScale)
-				
+                
         elif light_type == "Bidirectional":
             yi.paramsSetString("type", "bidirectional")
 

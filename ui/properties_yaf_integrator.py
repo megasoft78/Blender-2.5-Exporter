@@ -51,6 +51,17 @@ class YAF_PT_render(RenderButtonsPanel, Panel):
                 col.prop(scene, "intg_AO_samples")
                 col.prop(scene, "intg_AO_distance")
 
+            row = layout.row()
+            row.prop(scene, "intg_useSSS", toggle=False)
+
+            if scene.intg_useSSS:
+                col = layout.row()
+                col.prop(scene, "intg_sssPhotons")
+                col.prop(scene, "intg_sssDepth")
+                col = layout.row()
+                col.prop(scene, "intg_singleScatterSamples")
+                col.prop(scene, "intg_sssScale")
+                
         elif scene.intg_light_method == "Direct Lighting IC":
             row = layout.row()
             col = row.column(align=True)
@@ -75,6 +86,17 @@ class YAF_PT_render(RenderButtonsPanel, Panel):
                 col = layout.row()
                 col.prop(scene, "intg_IC_M_Divs")
                 col.prop(scene, "intg_IC_Kappa")
+                
+            row = layout.row()
+            row.prop(scene, "intg_useSSS", toggle=False)
+
+            if scene.intg_useSSS:
+                col = layout.row()
+                col.prop(scene, "intg_sssPhotons")
+                col.prop(scene, "intg_sssDepth")
+                col = layout.row()
+                col.prop(scene, "intg_singleScatterSamples")
+                col.prop(scene, "intg_sssScale")
                 
         elif scene.intg_light_method == "Photon Mapping":
             row = layout.row()
@@ -105,6 +127,17 @@ class YAF_PT_render(RenderButtonsPanel, Panel):
                 col = layout.row()
                 col.prop(scene, "intg_show_map", toggle=True)
 
+            row = layout.row()
+            row.prop(scene, "intg_useSSS", toggle=False)
+
+            if scene.intg_useSSS:
+                col = layout.row()
+                col.prop(scene, "intg_sssPhotons")
+                col.prop(scene, "intg_sssDepth")
+                col = layout.row()
+                col.prop(scene, "intg_singleScatterSamples")
+                col.prop(scene, "intg_sssScale")
+                
         elif scene.intg_light_method == "Photon Mapping IC":
             row = layout.row()
 
@@ -134,6 +167,17 @@ class YAF_PT_render(RenderButtonsPanel, Panel):
                 row = layout.row()
                 row.prop(scene, "intg_show_map", toggle=True)
 
+            row = layout.row()
+            row.prop(scene, "intg_useSSS", toggle=False)
+
+            if scene.intg_useSSS:
+                col = layout.row()
+                col.prop(scene, "intg_sssPhotons")
+                col.prop(scene, "intg_sssDepth")
+                col = layout.row()
+                col.prop(scene, "intg_singleScatterSamples")
+                col.prop(scene, "intg_sssScale")
+                
         elif scene.intg_light_method == "Photon Mapping GPU":
             row = layout.row()
 
@@ -181,6 +225,17 @@ class YAF_PT_render(RenderButtonsPanel, Panel):
             row.prop(scene, "intg_ph_benchmark_min_tile_size")
             row.prop(scene, "intg_ph_work_group_size")
             
+            row = layout.row()
+            row.prop(scene, "intg_useSSS", toggle=False)
+
+            if scene.intg_useSSS:
+                col = layout.row()
+                col.prop(scene, "intg_sssPhotons")
+                col.prop(scene, "intg_sssDepth")
+                col = layout.row()
+                col.prop(scene, "intg_singleScatterSamples")
+                col.prop(scene, "intg_sssScale")            
+            
         elif scene.intg_light_method == "Pathtracing":
             col = layout.row()
             col.prop(scene, "intg_caustic_method")
@@ -199,6 +254,17 @@ class YAF_PT_render(RenderButtonsPanel, Panel):
             col.prop(scene, "intg_bounces")
             col = layout.row()
             col.prop(scene, "intg_no_recursion")
+
+            row = layout.row()
+            row.prop(scene, "intg_useSSS", toggle=False)
+
+            if scene.intg_useSSS:
+                col = layout.row()
+                col.prop(scene, "intg_sssPhotons")
+                col.prop(scene, "intg_sssDepth")
+                col = layout.row()
+                col.prop(scene, "intg_singleScatterSamples")
+                col.prop(scene, "intg_sssScale")
 
         elif scene.intg_light_method == "Debug":
             layout.row().prop(scene, "intg_debug_type")

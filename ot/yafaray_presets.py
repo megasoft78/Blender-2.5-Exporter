@@ -208,6 +208,14 @@ class YAFARAY_OT_presets_renderset(YAF_AddPresetBase, Operator):
         "scene.intg_caustic_method",
         "scene.intg_path_samples",
         "scene.intg_no_recursion",
+		
+		# SSS Settings
+		"scene.intg_useSSS",
+		"scene.intg_sssPhotons",
+		"scene.intg_sssDepth",
+		"scene.intg_singleScatterSamples",
+		"scene.intg_sssScale",
+		
         "scene.intg_debug_type",
         "scene.intg_show_perturbed_normals",
         "scene.intg_pm_ire",

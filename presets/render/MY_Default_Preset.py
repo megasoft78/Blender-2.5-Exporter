@@ -25,10 +25,14 @@ scene.intg_photons = 500000
 scene.intg_caustic_mix = 100
 scene.intg_caustic_depth = 10
 scene.intg_caustic_radius = 1.0
+
+# SSS settings
+scene.intg_useSSS = False
 scene.intg_sssPhotons = 100000
 scene.intg_sssDepth = 5
 scene.intg_singleScatterSamples = 32
 scene.intg_sssScale = 30.0
+
 scene.intg_use_AO = False
 scene.intg_AO_samples = 32
 scene.intg_AO_distance = 1.0
