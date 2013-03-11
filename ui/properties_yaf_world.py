@@ -17,12 +17,19 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # <pep8 compliant>
-
+#povman 
+#import bpy
 from bpy.types import Panel
 from bl_ui.properties_world import WorldButtonsPanel
 
 WorldButtonsPanel.COMPAT_ENGINES = {'YAFA_RENDER'}
 
+# Inherit World data block
+from bl_ui.properties_world import WORLD_PT_context_world
+WORLD_PT_context_world.COMPAT_ENGINES.add('YAFA_RENDER')
+del WORLD_PT_context_world
+
+# Inherit World Preview Panel
 from bl_ui.properties_world import WORLD_PT_preview
 WORLD_PT_preview.COMPAT_ENGINES.add('YAFA_RENDER')
 del WORLD_PT_preview
@@ -64,7 +71,7 @@ class YAFWORLD_PT_world(WorldButtonsPanel, Panel):
 
             tex = context.scene.world.active_texture
 
-            if tex is not None:  # and tex.type == 'IMAGE': # revised if changed to yaf_tex_type
+            if tex is not None:
                 try:
                     layout.template_ID(context.world, "active_texture")  # new="texture.new")
                 except:
@@ -77,14 +84,16 @@ class YAFWORLD_PT_world(WorldButtonsPanel, Panel):
             else:
                 try:
                     layout.template_ID(context.world, "active_texture", new="texture.new")
-                except:  # TODO: create only image texture? procedural not supported.. ?
+                except:
                     pass
+            #        
             layout.prop(world, "bg_rotation")
 
             split = layout.split(percentage=0.33)
 
             col = split.column()
             col.prop(world, "bg_use_ibl")
+            
             if world.bg_use_ibl:
                 row = layout.row()
                 row.prop(world, "bg_with_diffuse")
@@ -113,9 +122,9 @@ class YAFWORLD_PT_world(WorldButtonsPanel, Panel):
             col = split.column()
             col.label(text=" ")
             sub = col.column(align=True)
-            sub.operator("world.get_position", text="Get Position")
-            sub.operator("world.get_angle", text="Get Angle")
-            sub.operator("world.update_sun", text="Update Sun")
+            sub.operator("world.get_position", text="Get from Location")
+            sub.operator("world.get_angle", text="Get from Angle")
+            sub.operator("world.update_sun", text="Update Lamp in 3D View")
 
             layout.separator()
 
@@ -136,7 +145,7 @@ class YAFWORLD_PT_world(WorldButtonsPanel, Panel):
 
             layout.column().prop(world, "bg_light_samples")
 
-        ## DarkTide Sunsky NOT more updated? ----->
+        ## DarkTide Sunsky
         elif world.bg_type == "Sunsky2":
             self.ibl = False
             layout.separator()
@@ -157,9 +166,9 @@ class YAFWORLD_PT_world(WorldButtonsPanel, Panel):
             col = split.column()
             col.label(text=" ")
             sub = col.column(align=True)
-            sub.operator("world.get_position", text="Get Position")
-            sub.operator("world.get_angle", text="Get Angle")
-            sub.operator("world.update_sun", text="Update Sun")
+            sub.operator("world.get_position", text="Get from Location")
+            sub.operator("world.get_angle", text="Get from Angle")
+            sub.operator("world.update_sun", text="Update Lamp in 3D View")
             col.prop(world, "bg_dsaltitude")
 
             layout.separator()
