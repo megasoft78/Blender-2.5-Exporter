@@ -43,8 +43,6 @@ class YafaRayRenderEngine(bpy.types.RenderEngine):
     tag = ""
     useViewToRender = False
     viewMatrix = None
-    # boolean variable to check for texture preview
-    is_texPrev = False
 
     def setInterface(self, yi):
         self.materialMap = {}
@@ -77,39 +75,33 @@ class YafaRayRenderEngine(bpy.types.RenderEngine):
 
     def exportTexture(self, obj):
         # First export the textures of the materials type 'blend'
-            for mat_slot in [m for m in obj.material_slots if m.material is not None]:
-                if mat_slot.material.mat_type == 'blend':
+        for mat_slot in [m for m in obj.material_slots if m.material is not None]:
+            if mat_slot.material.mat_type == 'blend':
+                try:
                     mat1 = bpy.data.materials[mat_slot.material.material1]
                     mat2 = bpy.data.materials[mat_slot.material.material2]
-                    for bm in [mat1, mat2]:
-                        for blendtex in [bt for bt in bm.texture_slots if (bt and bt.texture and bt.use)]:
-                            if self.is_preview and blendtex.texture.name == 'fakeshadow':
-                                continue
-                            self.yaf_texture.writeTexture(self.scene, blendtex.texture)
-                else:
+                except:
+                    self.yi.printWarning("Exporter: Problem with blend material {0}. Could not find one of the two blended materials".format(mat_slot.material.name))
                     continue
+                for bm in [mat1, mat2]:
+                    for blendtex in [bt for bt in bm.texture_slots if (bt and bt.texture and bt.use)]:
+                        if self.is_preview and blendtex.texture.name == 'fakeshadow':
+                            continue
+                        self.yaf_texture.writeTexture(self.scene, blendtex.texture)
+            else:
+                continue
 
-            for mat_slot in [m for m in obj.material_slots if m.material is not None]:
-                for tex in [t for t in mat_slot.material.texture_slots if (t and t.texture and t.use)]:
-                    if self.is_preview and tex.texture.name == "fakeshadow":
-                        continue
-                    # stretched plane needs to be fixed for texture preview
-                    if self.is_preview and obj.name == 'texture':
-                        bpy.types.YAFA_RENDER.is_texPrev = True
-                    else:
-                        bpy.types.YAFA_RENDER.is_texPrev = False
-                    self.yaf_texture.writeTexture(self.scene, tex.texture)
-
-    def checkForOrco(self, obj):
-        has_orco = False
         for mat_slot in [m for m in obj.material_slots if m.material is not None]:
             for tex in [t for t in mat_slot.material.texture_slots if (t and t.texture and t.use)]:
-                if tex.texture_coords == 'ORCO':
-                    has_orco = True
-                    break  # break tex loop
-            if has_orco:
-                break  # break mat_slot loop
-        return has_orco
+                if self.is_preview and tex.texture.name == "fakeshadow":
+                    continue
+                self.yaf_texture.writeTexture(self.scene, tex.texture)
+
+    def object_on_visible_layer(self, obj):
+        obj_visible = False
+        for layer_visible in [object_layers and scene_layers for object_layers, scene_layers in zip(obj.layers, self.scene.layers)]:
+            obj_visible |= layer_visible
+        return obj_visible
 
     def exportObjects(self):
         self.yi.printInfo("Exporter: Processing Lamps...")
@@ -136,22 +128,19 @@ class YafaRayRenderEngine(bpy.types.RenderEngine):
         dupBaseIds = {}
 
         for obj in [o for o in self.scene.objects if not o.hide_render and (o.is_visible(self.scene) or o.hide) \
-        and (o.type in {'MESH', 'SURFACE', 'CURVE', 'FONT', 'EMPTY'})]:
-            # Exporting dupliObjects as instances: disabled exporting instances when global
-            # option "transp. shadows" is on -> crashes yafaray render engine
-            # also check for dupliObject type 'EMPTY' and don't export them as geometry
+        and self.object_on_visible_layer(o) and (o.type in {'MESH', 'SURFACE', 'CURVE', 'FONT', 'EMPTY'})]:
+            # Exporting dupliObjects as instances, also check for dupliObject type 'EMPTY' and don't export them as geometry
             if obj.is_duplicator:
                 self.yi.printInfo("Processing duplis for: {0}".format(obj.name))
                 obj.dupli_list_create(self.scene)
 
                 for obj_dupli in [od for od in obj.dupli_list if not od.object.type == 'EMPTY']:
-                    has_orco = self.checkForOrco(obj_dupli.object)
                     self.exportTexture(obj_dupli.object)
                     for mat_slot in obj_dupli.object.material_slots:
                         if mat_slot.material not in self.materials:
                             self.exportMaterial(mat_slot.material)
 
-                    if self.scene.gs_transp_shad or has_orco:
+                    if not self.scene.render.use_instances:
                         matrix = obj_dupli.matrix.copy()
                         self.yaf_object.writeMesh(obj_dupli.object, matrix)
                     else:
@@ -175,44 +164,29 @@ class YafaRayRenderEngine(bpy.types.RenderEngine):
             elif obj.type == 'EMPTY':
                 continue
 
-            # Exporting objects with shared mesh data blocks as instances: disabled exporting instances when global
-            # option "transparent shadows" is on -> crashes yafaray render engine
-            elif obj.data.users > 1 and not self.scene.gs_transp_shad:
-                # check materials and textures of object for 'ORCO' texture coordinates
-                # if so: do not export them as instances -> gives weird rendering results!
-                has_orco = self.checkForOrco(obj)
+            # Exporting objects with shared mesh data blocks as instances
+            elif obj.data.users > 1 and self.scene.render.use_instances:
+                self.yi.printInfo("Processing shared mesh data node object: {0}".format(obj.name))
+                if obj.data.name not in baseIds:
+                    baseIds[obj.data.name] = self.yaf_object.writeInstanceBase(obj)
 
-                if has_orco:
-                    self.yaf_object.writeObject(obj)
-                else:
-                    self.yi.printInfo("Processing shared mesh data node object: {0}".format(obj.name))
-                    if obj.data.name not in baseIds:
-                        baseIds[obj.data.name] = self.yaf_object.writeInstanceBase(obj)
+                if obj.name not in dupBaseIds:
+                    matrix = obj.matrix_world.copy()
+                    self.yaf_object.writeInstance(baseIds[obj.data.name], matrix, obj.data.name)
 
-                    if obj.name not in dupBaseIds:
-                        matrix = obj.matrix_world.copy()
-                        self.yaf_object.writeInstance(baseIds[obj.data.name], matrix, obj.data.name)
-
-            else:
-                if obj.data.name not in baseIds and obj.name not in dupBaseIds:
-                    self.yaf_object.writeObject(obj)
+            elif obj.data.name not in baseIds and obj.name not in dupBaseIds:
+                self.yaf_object.writeObject(obj)
 
     def handleBlendMat(self, mat):
-        if mat.name == mat.material1:
-            self.yi.printError("Exporter: Blend material " + mat.name + " contains itself!")
-            return
-        elif mat.name == mat.material2:
-            self.yi.printError("Exporter: Blend material " + mat.name + " contains itself!")
-            return
-        elif mat.material1 == mat.material2:
-            self.yi.printError("Exporter: Blend material " + mat.material1 + " and " + mat.material2 + " are the same!")
-            return
-        elif not (mat.material1 and mat.material2 in bpy.data.materials):
-            self.yi.printWarning("Exporter: Problem with blend material " + mat.name + ". Could not find one of the two blended materials.")
-            return
-        else:
-            mat1 = bpy.data.materials[mat.material1]
-            mat2 = bpy.data.materials[mat.material2]
+            try:
+                mat1 = bpy.data.materials[mat.material1]
+                mat2 = bpy.data.materials[mat.material2]
+            except:
+                self.yi.printWarning("Exporter: Problem with blend material {0}. Could not find one of the two blended materials".format(mat.name))
+                return
+            if mat1.name == mat2.name:
+                self.yi.printWarning("Exporter: Problem with blend material {0}. {1} and {2} to blend are the same materials".format(mat.name, mat1.name, mat2.name))
+                return
 
             if mat1.mat_type == 'blend':
                 self.handleBlendMat(mat1)
@@ -310,11 +284,11 @@ class YafaRayRenderEngine(bpy.types.RenderEngine):
         [self.sizeX, self.sizeY, self.bStartX, self.bStartY, self.bsizeX, self.bsizeY, camDummy] = yaf_scene.getRenderCoords(scene)
 
         if render.use_border:
-            self.x = self.bsizeX
-            self.y = self.bsizeY
+            self.resX = self.bsizeX
+            self.resY = self.bsizeY
         else:
-            self.x = self.sizeX
-            self.y = self.sizeY        
+            self.resX = self.sizeX
+            self.resY = self.sizeY
 
         if scene.gs_type_render == "file":
             self.setInterface(yafrayinterface.yafrayInterface_t())
@@ -324,8 +298,8 @@ class YafaRayRenderEngine(bpy.types.RenderEngine):
             self.yi.paramsSetString("type", self.file_type)
             self.yi.paramsSetBool("alpha_channel", render.image_settings.color_mode == "RGBA")
             self.yi.paramsSetBool("z_channel", scene.gs_z_channel)
-            self.yi.paramsSetInt("width", self.x + self.bStartX)
-            self.yi.paramsSetInt("height", self.y + self.bStartY)
+            self.yi.paramsSetInt("width", self.resX)
+            self.yi.paramsSetInt("height", self.resY)
             self.ih = self.yi.createImageHandler("outFile")
             self.co = yafrayinterface.imageOutput_t(self.ih, str(self.outputFile), 0, 0)
 
@@ -357,10 +331,7 @@ class YafaRayRenderEngine(bpy.types.RenderEngine):
             self.yi.printInfo("Exporter: Rendering to file {0}".format(self.outputFile))
             self.update_stats("YafaRay Rendering:", "Rendering to {0}".format(self.outputFile))
             self.yi.render(self.co)
-            result = self.begin_result(self.bStartX,
-                                       self.bStartY,
-                                       self.x + self.bStartX,
-                                       self.y + self.bStartY)
+            result = self.begin_result(0, 0, self.resX, self.resY)
             lay = result.layers[0]
 
             # exr format has z-buffer included, so no need to load '_zbuffer' - file
@@ -395,6 +366,7 @@ class YafaRayRenderEngine(bpy.types.RenderEngine):
                     res.layers[0].rect = tile
                 except:
                     pass
+
                 self.end_result(res)
 
             def flushCallback(*args):
@@ -404,11 +376,12 @@ class YafaRayRenderEngine(bpy.types.RenderEngine):
                     res.layers[0].rect = tile
                 except BaseException as e:
                     pass
+
                 self.end_result(res)
 
             t = threading.Thread(
                                     target=self.yi.render,
-                                    args=(self.sizeX, self.sizeY, 0, 0,
+                                    args=(self.resX, self.resY, self.bStartX, self.bStartY,
                                     self.is_preview,
                                     drawAreaCallback,
                                     flushCallback,
