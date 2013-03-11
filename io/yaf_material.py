@@ -116,7 +116,7 @@ class yafMaterial:
         yi.paramsSetBool("color_input", isColored)
 
         if isImage:
-            useAlpha = (tex.use_alpha) and not(tex.use_calculate_alpha)
+            useAlpha = (tex.yaf_use_alpha) and not(tex.use_calculate_alpha)
 
         yi.paramsSetBool("use_alpha", useAlpha)
 
@@ -182,17 +182,17 @@ class yafMaterial:
         yi.paramsSetInt("proj_y", proj2int(mtex.mapping_y))
         yi.paramsSetInt("proj_z", proj2int(mtex.mapping_z))
 
-        if   mtex.mapping == 'FLAT':
-            yi.paramsSetString("mapping", "plain")
-        elif mtex.mapping == 'CUBE':
-            yi.paramsSetString("mapping", "cube")
-        elif mtex.mapping == 'TUBE':
-            yi.paramsSetString("mapping", "tube")
-        elif mtex.mapping == 'SPHERE':
-            yi.paramsSetString("mapping", "sphere")
+        switchMappingCoords = {
+            'FLAT': 'plain',
+            'CUBE': 'cube',
+            'TUBE': 'tube',
+            'SPHERE': 'sphere',
+        }
+        mappingCoords = switchMappingCoords.get(mtex.mapping, 'plain')
+        yi.paramsSetString("mapping", mappingCoords)
 
         yi.paramsSetPoint("offset", mtex.offset[0], mtex.offset[1], mtex.offset[2])
-        if bpy.types.YAFA_RENDER.is_texPrev:  # check if it is a texture preview render
+        if self.preview:  # check if it is a texture preview render
             mtex_X = mtex.scale[0] * 8.998  # tex preview fix: scale X value of tex size for the stretched Plane Mesh in preview scene
             mtex_Z = mtex.scale[2] * 0.00001  # and for Z value of texture size also...
             yi.paramsSetPoint("scale", mtex_X, mtex.scale[1], mtex_Z)
@@ -337,86 +337,6 @@ class yafMaterial:
 
         return yi.createMaterial(self.namehash(mat))
 
-    def writeTranslucentShader(self, mat):
-        yi = self.yi
-        yi.paramsClearAll()
-        yi.paramsSetString("type", "translucent")
-        yi.paramsSetFloat("IOR", mat.sssIOR)
-        
-        color = mat.sssColor
-        glossyColor=mat.glossy_color;
-        specColor = mat.sssSpecularColor
-        sA = mat.sssSigmaA
-        sS = mat.sssSigmaS
-        sSFactor = mat.sssSigmaS_factor
-        mD = mat.diffuse_reflect
-        mG = mat.glossy_reflect
-        mT = mat.sss_transmit
-        exp = mat.exponent
-        
-        yi.paramsSetColor("color", color[0], color[1], color[2])
-        yi.paramsSetColor("glossy_color", glossyColor[0], glossyColor[1], glossyColor[2])
-        yi.paramsSetColor("specular_color", specColor[0], specColor[1], specColor[2])
-        yi.paramsSetColor("sigmaA", sA[0], sA[1], sA[2])
-        yi.paramsSetColor("sigmaS", sS[0], sS[1], sS[2])
-        yi.paramsSetFloat("sigmaS_factor",sSFactor)
-        yi.paramsSetFloat("diffuse_reflect",mD)
-        yi.paramsSetFloat("glossy_reflect",mG)
-        yi.paramsSetFloat("sss_transmit",mT)
-        yi.paramsSetFloat("exponent",exp)
-        
-        diffRoot = ''
-        glossRoot = ''
-        glRefRoot = ''
-        transpRoot = ''
-        translRoot = ''
-        bumpRoot = ''
-        
-        i=0
-        used_mtextures = self.getUsedTextures(mat)
-
-        for mtex in used_mtextures:
-            used = False
-            mappername = "map%x" %i
-            
-            lname = "diff_layer%x" % i
-            if self.writeTexLayer(lname, mappername, diffRoot, mtex, mtex.use_map_color_diffuse, color, mtex.diffuse_color_factor):
-                used = True
-                diffRoot = lname
-            lname = "gloss_layer%x" % i
-            if self.writeTexLayer(lname, mappername, glossRoot, mtex, mtex.use_map_color_spec, glossyColor, mtex.specular_color_factor):
-                used = True
-                glossRoot = lname
-            lname = "glossref_layer%x" % i
-            if self.writeTexLayer(lname, mappername, glRefRoot, mtex, mtex.use_map_specular, [mG], mtex.specular_color_factor):
-                used = True
-                glRefRoot = lname
-            lname = "transp_layer%x" % i
-            if self.writeTexLayer(lname, mappername, transpRoot, mtex, mtex.use_map_alpha, sA, mtex.alpha_factor):
-                used = True
-                transpRoot = lname
-            lname = "translu_layer%x" % i
-            if self.writeTexLayer(lname, mappername, translRoot, mtex, mtex.use_map_translucency, sS, mtex.translucency_factor):
-                used = True
-                translRoot = lname
-            lname = "bump_layer%x" % i
-            if self.writeTexLayer(lname, mappername, bumpRoot, mtex, mtex.use_map_normal, [0], mtex.normal_factor):
-                used = True
-                bumpRoot = lname
-            if used:
-                self.writeMappingNode(mappername, mtex.texture.name, mtex)
-            i +=1
-        
-        yi.paramsEndList()
-        if len(diffRoot) > 0:    yi.paramsSetString("diffuse_shader", diffRoot)
-        if len(glossRoot) > 0:    yi.paramsSetString("glossy_shader", glossRoot)
-        if len(glRefRoot) > 0:    yi.paramsSetString("glossy_reflect_shader", glRefRoot)
-        if len(bumpRoot) > 0:    yi.paramsSetString("bump_shader", bumpRoot)
-        if len(transpRoot) > 0:    yi.paramsSetString("sigmaA_shader", transpRoot)
-        if len(translRoot) > 0:    yi.paramsSetString("sigmaS_shader", translRoot)
-
-        return yi.createMaterial(self.namehash(mat))
-        
     def writeShinyDiffuseShader(self, mat):
         yi = self.yi
         yi.paramsClearAll()
@@ -587,8 +507,6 @@ class yafMaterial:
             ymat = self.writeShinyDiffuseShader(mat)
         elif mat.mat_type == "blend":
             ymat = self.writeBlendShader(mat)
-        elif mat.mat_type == "translucent":
-            ymat = self.writeTranslucentShader(mat)
         else:
             ymat = self.writeNullMat(mat)
 
