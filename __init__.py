@@ -31,12 +31,12 @@ sys.path.append(BIN_PATH)
 bl_info = {
     "name": "YafaRay Exporter",
     "description": "YafaRay integration for blender",
-    "author": "Shuvro Sarker, Kim Skoglund (Kerbox), "
-              "Pedro Alcaide (povmaniaco), Paulo Gomes (tuga3d), "
-              "Michele Castigliego (subcomandante), Bert Buchholz, "
-              "Rodrigo Placencia (DarkTide), Alexander Smirnov (Exvion)",
-    "version": (0, 1, 2, 'alpha'),
-    "blender": (2, 6, 2),
+    "author": "Shuvro Sarker, Kim Skoglund (Kerbox), Pedro Alcaide (povmaniaco),"
+              "Paulo Gomes (tuga3d), Michele Castigliego (subcomandante),"
+              "Bert Buchholz, Rodrigo Placencia (DarkTide),"
+              "Alexander Smirnov (Exvion), Olaf Arnold (olaf)",
+    "version": (0, 1, 2, 'beta'),
+    "blender": (2, 6, 3),
     "location": "Info Header > Engine dropdown menu",
     "warning": "both YafaRay 0.1.2 and this script are in alpha state",
     "wiki_url": "http://www.yafaray.org/community/forum",
@@ -45,20 +45,28 @@ bl_info = {
     }
 
 # Preload needed libraries
+# Loading order of the dlls is sensible please do not alter it
 if sys.platform == 'win32':
-    # Loading order of the dlls is sensible please do not alter it
-    dllArray = ['zlib1', 'libxml2-2', 'libgcc_s_sjlj-1', 'Half', 'Iex', 'IlmThread', 'IlmImf', \
-    'libjpeg-8', 'libpng14', 'libtiff-3', 'libfreetype-6', 'libyafaraycore', 'libyafarayplugin', 'libopencl_wrapper']
+    for file in os.listdir(BIN_PATH):
+        # load dll's from a MSVC installation
+        if file in {'yafaraycore.dll'}:
+            dllArray = ['zlib1', 'iconv', 'zlib', 'libpng15', 'libxml2', 'yafaraycore', 'yafarayplugin']
+            break
+        # load dll's from a MinGW installation
+        else:
+            dllArray = ['zlib1', 'libxml2-2', 'libgcc_s_sjlj-1', 'Half', 'Iex', 'IlmThread', 'IlmImf', 'libjpeg-8', \
+                       'libpng14', 'libtiff-3', 'libfreetype-6', 'libyafaraycore', 'libyafarayplugin']
+
 elif sys.platform == 'darwin':
     dllArray = ['libyafaraycore.dylib', 'libyafarayplugin.dylib']
 else:
-    dllArray = ['libopencl_wrapper.so', 'libyafaraycore.so', 'libyafarayplugin.so']
+    dllArray = ['libyafaraycore.so', 'libyafarayplugin.so']
 
 for dll in dllArray:
     try:
         ctypes.cdll.LoadLibrary(os.path.join(BIN_PATH, dll))
     except Exception as e:
-        print("ERROR: Failed to load library " + dll + ", " + repr(e))
+        print("ERROR: Failed to load library {0}, {1}".format(dll, repr(e)))
 
 if "bpy" in locals():
     import imp
@@ -84,7 +92,7 @@ def load_handler(dummy):
             print("Load Handler: Convert Yafaray texture \"{0}\" with texture type: \"{1}\" to \"{2}\"".format(tex.name, tex.yaf_tex_type, tex.type))
             tex.yaf_tex_type = tex.type
     # convert image output file type setting from blender to yafaray's file type setting on file load, so that both are the same...
-    if bpy.context.scene.render.image_settings.file_format != bpy.context.scene.img_output:
+    if bpy.context.scene.render.image_settings.file_format is not bpy.context.scene.img_output:
         bpy.context.scene.img_output = bpy.context.scene.render.image_settings.file_format
 
 
