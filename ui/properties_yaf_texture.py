@@ -76,8 +76,10 @@ class YAF_TEXTURE_PT_context_texture(YAF_TextureButtonsPanel, Panel):
 
         if tex_collection:
             row = layout.row()
-
-            row.template_list(idblock, "texture_slots", idblock, "active_texture_index", rows=2)
+            if bpy.app.version < (2, 65, 3 ):
+                row.template_list(idblock, "texture_slots", idblock, "active_texture_index", rows=2)
+            else:
+                row.template_list("TEXTURE_UL_texslots", "", idblock, "texture_slots", idblock, "active_texture_index", rows=2)
 
             col = row.column(align=True)
             col.operator("texture.slot_move", text="", icon='TRIA_UP').type = 'UP'
@@ -269,8 +271,14 @@ class YAF_TEXTURE_PT_image_sampling(YAF_TextureTypePanel, Panel):
 
         tex = context.texture
         layout.label(text="Image:")
-        layout.prop(tex, "use_alpha", text="Use Alpha")
-        layout.prop(tex, "use_calculate_alpha", text="Calculate Alpha")
+        row = layout.row(align=True)
+        # povman test: change layout to row for save space
+        #layout.prop(tex, "yaf_use_alpha", text="Use Alpha")
+        #layout.prop(tex, "use_calculate_alpha", text="Calculate Alpha")
+        row.prop(tex, "yaf_use_alpha", text="Use Alpha")
+        row.prop(tex, "use_calculate_alpha", text="Calculate Alpha")
+        # test
+        #layout = self.layout
         layout.prop(tex, "use_flip_axis", text="Flip X/Y Axis")
 
 
@@ -450,13 +458,22 @@ class YAF_TEXTURE_PT_mapping(YAF_TextureSlotPanel, Panel):
 
         tex = context.texture_slot
         # textype = context.texture
-
+        
         if not isinstance(idblock, Brush):
-            split = layout.split(percentage=0.3)
-            col = split.column()
-            col.label(text="Coordinates:")
-            col = split.column()
-            col.prop(tex, "texture_coords", text="")
+            if isinstance(idblock, World):
+                split = layout.split(percentage=0.3)
+                col = split.column()
+                world = context.world
+                col.label(text="Background Coordinates:")
+                col = split.column()
+                col.prop(world, "yaf_mapworld_type", text="")
+            else:
+                split = layout.split(percentage=0.3)
+                col = split.column()
+                col.label(text="Coordinates:")
+                col = split.column()
+                col.prop(tex, "texture_coords", text="")
+                
 
             if tex.texture_coords == 'UV':
                 pass
@@ -505,7 +522,9 @@ class YAF_TEXTURE_PT_mapping(YAF_TextureSlotPanel, Panel):
                 row.prop(tex, "mapping_x", text="")
                 row.prop(tex, "mapping_y", text="")
                 row.prop(tex, "mapping_z", text="")
-
+        
+        # tes povman
+        #if not isinstance(idblock, World):
         row = layout.row()
         row.column().prop(tex, "offset")
         row.column().prop(tex, "scale")
