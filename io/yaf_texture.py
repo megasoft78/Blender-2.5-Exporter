@@ -309,9 +309,9 @@ class yafTexture:
             yi.printInfo("Exporter: Creating Texture: '{0}' type {1}: {2}".format(name, tex.yaf_tex_type, image_tex))
 
             yi.paramsSetString("type", "image")
-            yi.paramsSetString("filename", image_file)
+            yi.paramsSetString("filename", image_tex)
 
-            yi.paramsSetBool("use_alpha", tex.use_alpha)
+            yi.paramsSetBool("use_alpha", tex.yaf_use_alpha)
             yi.paramsSetBool("calc_alpha", tex.use_calculate_alpha)
             yi.paramsSetBool("normalmap", tex.yaf_is_normal_map)
             yi.paramsSetFloat("gamma", scene.gs_gamma_input)
