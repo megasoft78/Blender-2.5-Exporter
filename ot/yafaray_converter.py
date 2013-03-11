@@ -219,8 +219,6 @@ def convertMaterial(mat):
 
     if props["type"] == "Rough Glass":
         mat.mat_type = "rough_glass"
-    elif props["type"] == "Translucent (SSS)":
-        mat.mat_type = "translucent"
     else:
         mat.mat_type = props["type"]
 
