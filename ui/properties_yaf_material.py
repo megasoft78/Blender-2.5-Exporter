@@ -60,8 +60,10 @@ class YAF_PT_context_material(MaterialButtonsPanel, Panel):
 
         if ob:
             row = layout.row()
-
-            row.template_list(ob, "material_slots", ob, "active_material_index", rows=2)
+            if bpy.app.version < (2, 65, 3 ):
+                row.template_list(ob, "material_slots", ob, "active_material_index", rows=2)
+            else:
+                row.template_list("MATERIAL_UL_matslots", "", ob, "material_slots", ob, "active_material_index", rows=2)
 
             col = row.column(align=True)
             col.operator("object.material_slot_add", icon='ZOOMIN', text="")
@@ -322,35 +324,14 @@ class YAF_PT_blend_(MaterialTypePanel, Panel):
         box.label(text="Choose the two materials you wish to blend.")
         split = box.split()
         col = split.column()
-        col.label(text="Material One:")
-        col.prop_search(yaf_mat, "material1", bpy.data, 'materials', text="")
+        col.label(text="Material one:")
+        col.prop(yaf_mat, "material1", text="")
 
         col = split.column()
-        col.label(text="Material Two:")
-        col.prop_search(yaf_mat, "material2", bpy.data, 'materials', text="")
+        col.label(text="Material two:")
+        col.prop(yaf_mat, "material2", text="")
 
-class YAF_PT_translucent(MaterialTypePanel, Panel):
-    bl_label = "Translucent (SSS) settings"
-    material_type = 'translucent'
 
-    def draw(self, context):
-        layout = self.layout
-        yaf_mat = active_node_mat(context.material)
-
-        split = layout.split()
-        col = split.column()
-        col.prop(yaf_mat, "sssColor")
-        col.prop(yaf_mat, "diffuse_reflect")
-        col.prop(yaf_mat, "sssSpecularColor")
-        col.prop(yaf_mat, "sssSigmaS")
-        col.prop(yaf_mat, "sssSigmaS_factor")
-        col = split.column()
-        col.prop(yaf_mat, "glossy_color")
-        col.prop(yaf_mat, "glossy_reflect")
-        col.prop(yaf_mat, "sssSigmaA")
-        col.prop(yaf_mat, "sss_transmit")
-        col.prop(yaf_mat, "exponent")
-        col.prop(yaf_mat, "sssIOR")
 
 if __name__ == "__main__":  # only for live edit.
     import bpy
