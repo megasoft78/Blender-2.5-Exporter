@@ -40,6 +40,43 @@ class YAFRENDER_PT_render(RenderButtonsPanel, Panel):
         layout.prop(rd, "display_mode", text="Display")
 
 
+class YAFRENDER_PT_layers(RenderButtonsPanel, Panel):
+    bl_label = "Layers"
+    bl_options = {'DEFAULT_CLOSED'}
+
+    def draw(self, context):
+        layout = self.layout
+
+        scene = context.scene
+        rd = scene.render
+
+        row = layout.row()
+        if bpy.app.version < (2, 65, 3 ):
+            row.template_list(rd, "layers", rd.layers, "active_index", rows=2)
+        else:
+            row.template_list("RENDER_UL_renderlayers", "", rd, "layers", rd.layers, "active_index", rows=2)
+
+        col = row.column(align=True)
+        col.operator("scene.render_layer_add", icon='ZOOMIN', text="")
+        col.operator("scene.render_layer_remove", icon='ZOOMOUT', text="")
+
+        row = layout.row()
+        rl = rd.layers.active
+        row.prop(rl, "name")
+        row.prop(rd, "use_single_layer", text="", icon_only=True)
+
+        split = layout.split()
+
+        col = split.column()
+        col.prop(scene, "layers", text="Scene")
+        # TODO: Implement material override
+        #col.prop(rl, "material_override", text="Material")
+
+        col = split.column()
+        # TODO: Implement render layers
+        #col.prop(rl, "layers", text="Layer")
+
+
 class YAFRENDER_PT_dimensions(RenderButtonsPanel, Panel):
     bl_label = "Dimensions"
     bl_options = {'DEFAULT_CLOSED'}
@@ -64,8 +101,11 @@ class YAFRENDER_PT_dimensions(RenderButtonsPanel, Panel):
         sub.prop(rd, "resolution_y", text="Y")
         sub.prop(rd, "resolution_percentage", text="")
 
-        # Border render disabled in UI, has to be solved in YafaRay engine first...
-        # layout.row().prop(rd, "use_border", text="Border", toggle=True)
+        row = col.row()
+        row.prop(rd, "use_border", text="Border")
+        sub = row.row()
+        sub.active = rd.use_border
+        sub.prop(rd, "use_crop_to_border", text="Crop")
 
         col = split.column()
         sub = col.column(align=True)
@@ -80,7 +120,7 @@ from . import properties_yaf_AA_settings
 
 
 class YAFRENDER_PT_output(RenderButtonsPanel, Panel):
-    bl_label = "Output Settings"
+    bl_label = "Output"
 
     def draw(self, context):
         layout = self.layout
