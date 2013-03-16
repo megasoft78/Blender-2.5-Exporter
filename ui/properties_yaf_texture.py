@@ -464,7 +464,7 @@ class YAF_TEXTURE_PT_mapping(YAF_TextureSlotPanel, Panel):
                 split = layout.split(percentage=0.3)
                 col = split.column()
                 world = context.world
-                col.label(text="Background Coordinates:")
+                col.label(text="Coordinates:")
                 col = split.column()
                 col.prop(world, "yaf_mapworld_type", text="")
             else:
