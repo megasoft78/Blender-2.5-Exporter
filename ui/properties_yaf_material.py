@@ -268,6 +268,10 @@ class YAF_PT_glass_real(MaterialTypePanel, Panel):
         layout.label(text="Refraction and Reflections:")
         split = layout.split()
         col = split.column()
+        col.prop(yaf_mat, "glass_internal_reflect_depth")
+
+        split = layout.split()
+        col = split.column()
         col.prop(yaf_mat, "IOR_refraction")
 
         col = split.column()

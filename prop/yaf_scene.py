@@ -115,6 +115,11 @@ def register():
         name="Draw parameters",
         description="Write the render parameters below the image",
         default=False)
+        
+    Scene.transparent_background = BoolProperty(
+        name="Transparent Background",
+        description="Render the background as Transparent",
+        default=True)
 
     Scene.gs_custom_string = StringProperty(
         name="Custom string",
