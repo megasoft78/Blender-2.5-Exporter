@@ -20,6 +20,7 @@
 
 import bpy
 from bpy.props import (FloatProperty,
+												IntProperty,
                        BoolProperty,
                        EnumProperty,
                        FloatVectorProperty,
@@ -55,6 +56,11 @@ def register():
             ('translucent', "Translucent (SSS)", "Assign a material type")
         ),
         default='shinydiffusemat')
+
+    Material.glass_internal_reflect_depth = IntProperty(
+        name="Max internal reflection bounces",
+        description="Max. number of bounces for internal reflection calculation. Recommended=3 for glass balls",
+        min=0, max=32, default=2)
 
     Material.diffuse_reflect = FloatProperty(
         name="Reflection strength",
@@ -326,6 +332,7 @@ def register():
 
 def unregister():
     del Material.mat_type
+    del Material.glass_internal_reflect_depth
     del Material.diffuse_reflect
     del Material.specular_reflect
     del Material.transparency

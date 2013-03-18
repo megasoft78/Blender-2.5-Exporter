@@ -217,6 +217,7 @@ class yafMaterial:
         else:
             yi.paramsSetString("type", "glass")
 
+        yi.paramsSetInt("glass_internal_reflect_depth", mat.glass_internal_reflect_depth)
         yi.paramsSetFloat("IOR", mat.IOR_refraction)  # added IOR for refraction
         filt_col = mat.filter_color
         mir_col = mat.glass_mir_col

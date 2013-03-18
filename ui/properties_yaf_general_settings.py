@@ -84,6 +84,7 @@ class YAF_PT_general_settings(RenderButtonsPanel, Panel):
         col.prop(scene, "gs_transp_shad")
         col.prop(scene, "gs_premult")
         col.prop(scene, "gs_draw_params")
+        col.prop(scene, "transparent_background")
 
         col = split.column()
         col.prop(scene, "gs_auto_threads")
