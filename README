@@ -1,29 +1,41 @@
-Yafaray Exporter for Blender 2.66a:
+Yafaray Exporter experimental branchs, update for use with Blender 2.66a:
+#-----------------------------------------------------------------------------#
+ABOUT THIS EXPERIMENTAL VERSION:
+================================
+This repo is the base to synchronize the YafaRay Blender exporter with the
+experimental branches, created in GSOC 2010 and that you can find in this link:
 
-Special notes: 
-This repository  is a base, for experimental 'Photon Mapping Irradiance Cache' exporter support.
-Project from GSOC 2010, started by 'Glaskows'.
+https://github.com/megasoft78/Core
 
-More infor:
-http://www.yafaray.org/community/forum/viewtopic.php?f=24&t=3531
+More info about YafaRay GSOC 2010 projects in this forum thread:
+http://www.yafaray.org/community/forum/viewforum.php?f=24
 
-The exporter is in an experimental stage, so use it for testing purposes only.
-For the latest exporter updates check:
+This exporter is an experimental and unstable version only for testing purposes.
+Use it under your own responsibility.
 
-https://github.com/YafaRay/Blender-2.5-Exporter
+Do clikl in the button ' ZIP ' of this page to obtain a compressed file.
 
-and for the latest Yafaray builds (including exporter files too) 
-check megasofts builds on graphicall.org:
+We need to receive feedback on his functioning or his errors to improve this
+versions. Please, prove it and inform us about any mistake that he should find.
 
-http://www.graphicall.org/megasoft78
+http://www.yafaray.org/development/bugtracker/yafaray
 
-or look into this forum post for other platform builds:
+Thank you!!
+
+#-----------------------------------------------------------------------------#
+ABOUT STABLE VERSIONS:
+======================
+For the latest stable exporter sources updates check:
+
+https://github.com/YafaRay/Blender-Exporter
+
+To obtain the last stable versions of YafaRay binaries, look for the last
+compilations in Graphicall.org (the files of the exporter are included.):
+
+http://www.graphicall.org/yafaray
+
+To continue the development of the stable YafaRay Exporter, see this link:
 
 http://www.yafaray.org/community/forum/viewtopic.php?f=16&t=3520
-
-Download and extract the exporter files and folders to the 'Blender/2.66/scripts/addons/yafaray' directory.
-
-We need to test it, please post bugreports and feature requests here:
-http://www.yafaray.org/development/bugtracker/yafaray
 
 Thank you.
