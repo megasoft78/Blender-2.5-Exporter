@@ -36,8 +36,9 @@ class yafIntegrator:
         yi.printInfo("Exporting Integrator: {0}".format(light_type))
 
         if light_type == "Direct Lighting":
-            yi.paramsSetString("type", "directlighting")
-
+            # test
+            intg_type = 'directlighting'
+            
             yi.paramsSetBool("caustics", scene.intg_use_caustics)
 
             if scene.intg_use_caustics:
@@ -53,86 +54,50 @@ class yafIntegrator:
 
                 c = scene.intg_AO_color
                 yi.paramsSetColor("AO_color", c[0], c[1], c[2])
-            # new options
-            if scene.intg_useSSS:
-                yi.paramsSetInt("sssPhotons", scene.intg_sssPhotons)
-                yi.paramsSetInt("sssDepth", scene.intg_sssDepth)
-                yi.paramsSetInt("singleScatterSamples", scene.intg_singleScatterSamples)
-                yi.paramsSetFloat("sssScale", scene.intg_sssScale)
-                
-        elif light_type == "Direct Lighting IC":
-            yi.paramsSetInt("bounces", scene.intg_bounces)
-            yi.paramsSetInt("photons", scene.intg_photons)
-            yi.paramsSetInt("cPhotons", scene.intg_cPhotons)
-            yi.paramsSetFloat("diffuseRadius", scene.intg_diffuse_radius)
-            yi.paramsSetFloat("causticRadius", scene.intg_caustic_radius)
-            yi.paramsSetInt("search", scene.intg_search)
-            yi.paramsSetInt("caustic_mix", scene.intg_caustic_mix)
-            #
-            yi.paramsSetBool("finalGather", True)
-            yi.paramsSetBool("show_map", scene.intg_show_map)
-            yi.paramsSetInt("fg_samples", 1)# IC only use 1 fg sample, atm...
-            yi.paramsSetInt("fg_bounces", 3)# only for test
             
             if scene.intg_do_IC:
                 yi.paramsSetBool("do_IC", scene.intg_do_IC)
                 yi.paramsSetInt("IC_M_Divs", scene.intg_IC_M_Divs)
                 yi.paramsSetFloat("IC_Kappa", scene.intg_IC_Kappa)
-                
-            if scene.intg_useSSS:
-                yi.paramsSetInt("sssPhotons", scene.intg_sssPhotons)
-                yi.paramsSetInt("sssDepth", scene.intg_sssDepth)
-                yi.paramsSetInt("singleScatterSamples", scene.intg_singleScatterSamples)
-                yi.paramsSetFloat("sssScale", scene.intg_sssScale)
-                
-            yi.paramsSetString("type", "directIC")
-        
+                #
+                intg_type = 'directIC'
+            #    
+            yi.paramsSetString("type", intg_type)        
         
         elif light_type == "Photon Mapping":
-            yi.paramsSetString("type", "photonmapping")
-            yi.paramsSetInt("fg_samples", scene.intg_fg_samples)
+            # integrate IrradianceCache options
+            intg_type = 'photonmapping'
+            yi.paramsSetInt("bounces", scene.intg_bounces)
+            
             yi.paramsSetInt("photons", scene.intg_photons)
             yi.paramsSetInt("cPhotons", scene.intg_cPhotons)
             yi.paramsSetFloat("diffuseRadius", scene.intg_diffuse_radius)
             yi.paramsSetFloat("causticRadius", scene.intg_caustic_radius)
             yi.paramsSetInt("search", scene.intg_search)
-            yi.paramsSetBool("show_map", scene.intg_show_map)
-            yi.paramsSetInt("fg_bounces", scene.intg_fg_bounces)
-            yi.paramsSetInt("caustic_mix", scene.intg_caustic_mix)
-            yi.paramsSetBool("finalGather", scene.intg_final_gather)
-            yi.paramsSetInt("bounces", scene.intg_bounces)
-            if scene.intg_useSSS:
-                yi.paramsSetInt("sssPhotons", scene.intg_sssPhotons)
-                yi.paramsSetInt("sssDepth", scene.intg_sssDepth)
-                yi.paramsSetInt("singleScatterSamples", scene.intg_singleScatterSamples)
-                yi.paramsSetFloat("sssScale", scene.intg_sssScale)
-            
-        elif light_type == "Photon Mapping IC":
-            yi.paramsSetInt("bounces", scene.intg_bounces)
-            yi.paramsSetInt("photons", scene.intg_photons)
-            yi.paramsSetInt("cPhotons", scene.intg_cPhotons)
-            yi.paramsSetFloat("diffuseRadius", scene.intg_diffuse_radius)
-            yi.paramsSetFloat("causticRadius", scene.intg_caustic_radius)
-            yi.paramsSetInt("search", scene.intg_search)
-            yi.paramsSetInt("caustic_mix", scene.intg_caustic_mix)
-            #
-            yi.paramsSetBool("finalGather", True)
-            yi.paramsSetBool("show_map", scene.intg_show_map)
-            yi.paramsSetInt("fg_samples", 1)# IC only use 1 fg sample, atm...
-            yi.paramsSetInt("fg_bounces", 3)# only for test
-            
+            yi.paramsSetInt("caustic_mix", scene.intg_caustic_mix)            
+            # test
+            finalGather = scene.intg_final_gather
+            fg_bounces = scene.intg_fg_bounces
+            fg_samples = scene.intg_fg_samples
+            #            
             if scene.intg_do_IC:
                 yi.paramsSetBool("do_IC", scene.intg_do_IC)
                 yi.paramsSetInt("IC_M_Divs", scene.intg_IC_M_Divs)
                 yi.paramsSetFloat("IC_Kappa", scene.intg_IC_Kappa)
                 
-            if scene.intg_useSSS:
-                yi.paramsSetInt("sssPhotons", scene.intg_sssPhotons)
-                yi.paramsSetInt("sssDepth", scene.intg_sssDepth)
-                yi.paramsSetInt("singleScatterSamples", scene.intg_singleScatterSamples)
-                yi.paramsSetFloat("sssScale", scene.intg_sssScale)
+                ''' Only for test. Lack review code from Core '''
+                finalGather =  True
+                fg_samples =  1 # IC only use 1 fg sample, atm...
+                fg_bounces =  3 # only for test
+                #            
+                intg_type = 'photonIC'
+            #
+            yi.paramsSetBool("finalGather", finalGather)
+            yi.paramsSetInt("fg_bounces", fg_bounces)
+            yi.paramsSetInt("fg_samples", fg_samples)
+            yi.paramsSetBool("show_map", scene.intg_show_map)
                 
-            yi.paramsSetString("type", "photonIC")
+            yi.paramsSetString("type", intg_type)
 
         elif light_type == "Photon Mapping GPU":
             yi.paramsSetInt("bounces", scene.intg_bounces)
@@ -237,6 +202,13 @@ class yafIntegrator:
             yi.paramsSetInt("bounces", scene.intg_bounces)
             yi.paramsSetInt("passNums", scene.intg_pass_num)
             yi.paramsSetBool("pmIRE", scene.intg_pm_ire)
+        
+        # valid for all modes ( if available )
+        if scene.intg_useSSS:
+            yi.paramsSetInt("sssPhotons", scene.intg_sssPhotons)
+            yi.paramsSetInt("sssDepth", scene.intg_sssDepth)
+            yi.paramsSetInt("singleScatterSamples", scene.intg_singleScatterSamples)
+            yi.paramsSetFloat("sssScale", scene.intg_sssScale)
 
         yi.createIntegrator("default")
         return True

@@ -186,9 +186,9 @@ def register():
         name="Lighting Method",
         items=(
             ('Direct Lighting', "Direct Lighting", ""),
-            ('Direct Lighting IC', "Direct Lighting IC", ""),
+            #('Direct Lighting IC', "Direct Lighting IC", ""),
             ('Photon Mapping', "Photon Mapping", ""),
-            ('Photon Mapping IC', "Photon Mapping IC", ""),
+            #('Photon Mapping IC', "Photon Mapping IC", ""),
             ('Photon Mapping GPU', "Photon Mapping GPU", ""),
             ('Pathtracing', "Pathtracing", ""),
             ('Debug', "Debug", ""),
@@ -281,7 +281,7 @@ def register():
     # Photonmap IC settings /--------------------------------------->
     Scene.intg_do_IC = BoolProperty(
         name="Use Irradiance Cache",
-        description="Enable the use of irradiance cache",
+        description="Enable the use of Irradiance Cache",
         default=True)
 
     Scene.intg_IC_M_Divs = IntProperty(
